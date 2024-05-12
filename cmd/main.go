@@ -33,7 +33,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	PORT := flag.String("PORT", ":3000", "Exposed server port")
+	PORT := flag.String("PORT", ":8080", "Exposed server port")
 	router := http.NewServeMux()
 	server := &http.Server{
 		Addr:    *PORT,
