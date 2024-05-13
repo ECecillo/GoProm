@@ -1,1 +1,7 @@
+# Macos
+
+.DS_Store
+
+# Binary
+
 bin/
