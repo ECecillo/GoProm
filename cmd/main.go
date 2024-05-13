@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"net/http"
-	"time"
 
+	"github.com/ECecillo/GoProm/handlers"
 	"github.com/ECecillo/GoProm/middleware"
 	"github.com/ECecillo/GoProm/types"
 	"github.com/prometheus/client_golang/prometheus"
@@ -22,21 +22,11 @@ func createStack(xs ...types.Middleware) types.Middleware {
 	}
 }
 
-var serverStartTime time.Time
-
-func NewResponseWriter(w http.ResponseWriter) {
-	panic("unimplemented")
-}
 
 func init() {
-	serverStartTime = time.Now()
 	prometheus.Register(middleware.TotalRequests)
 }
 
-func ServerAlive(w http.ResponseWriter, r *http.Request) {
-	uptime := time.Since(serverStartTime)
-	fmt.Fprintln(w, "Server is alive since : ", uptime.String())
-}
 
 func main() {
 	PORT := flag.String("PORT", ":8080", "Exposed server port")
@@ -47,7 +37,7 @@ func main() {
 		Handler: middelwares(router),
 	}
 
-	router.HandleFunc("GET /api/liveliness", ServerAlive)
+	router.HandleFunc("GET /api/liveliness", handlers.ServerAlive)
 	router.Handle("/metrics", promhttp.Handler())
 
 	fmt.Println("Server running")
