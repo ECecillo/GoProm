@@ -14,8 +14,6 @@ services:
     restart: unless-stopped
     ports:
      - '3000:3000'
-    volumes:
-      - grafana-storage:/var/lib/grafana
   prometheus:
     image: prom/prometheus:v2.52.0
     volumes:
