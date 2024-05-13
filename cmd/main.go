@@ -6,20 +6,31 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ECecillo/GoProm/middleware"
+	"github.com/ECecillo/GoProm/types"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
+func createStack(xs ...types.Middleware) types.Middleware {
+	return func(next http.Handler) http.Handler {
+		for i := len(xs) - 1; i >= 0; i-- {
+			x := xs[i]
+			next = x(next)
+		}
+		return next
+	}
+}
+
 var serverStartTime time.Time
-var pingCounter = prometheus.NewCounter(
-	prometheus.CounterOpts{
-		Name: "ping_request_count",
-		Help: "Number of request handled by Ping Handler",
-	},
-)
+
+func NewResponseWriter(w http.ResponseWriter) {
+	panic("unimplemented")
+}
 
 func init() {
 	serverStartTime = time.Now()
+	prometheus.Register(middleware.TotalRequests)
 }
 
 func ServerAlive(w http.ResponseWriter, r *http.Request) {
@@ -27,22 +38,16 @@ func ServerAlive(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Server is alive since : ", uptime.String())
 }
 
-func ping(w http.ResponseWriter, r *http.Request) {
-	pingCounter.Inc()
-	fmt.Fprintln(w, "PONG")
-}
-
 func main() {
 	PORT := flag.String("PORT", ":8080", "Exposed server port")
 	router := http.NewServeMux()
+	middelwares := createStack(middleware.Prometheus)
 	server := &http.Server{
 		Addr:    *PORT,
-		Handler: router,
+		Handler: middelwares(router),
 	}
-	prometheus.MustRegister(pingCounter)
 
 	router.HandleFunc("GET /api/liveliness", ServerAlive)
-	router.HandleFunc("GET /api/ping", ping)
 	router.Handle("/metrics", promhttp.Handler())
 
 	fmt.Println("Server running")
