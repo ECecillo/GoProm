@@ -14,7 +14,7 @@ RUN go mod download
 COPY . ./
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o bin/goprom-server ./...
+RUN CGO_ENABLED=0 GOOS=linux go build -v -o bin/goprom-server ./cmd/main.go
 
 
 # Use a Docker multi-stage build to create a lean production image.
