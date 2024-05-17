@@ -1,4 +1,4 @@
-.PHONY: build-all build run docker-image dev
+.PHONY: build-all build run docker-image dev clean clean-all
 
 build:
 	@go build -o bin/server cmd/main.go
@@ -11,3 +11,9 @@ docker-image:
 
 build-all: build docker-image
 	@./bin/server
+
+clean:
+	@rm -rf bin
+
+clean-all: clean
+	@docker rmi api
