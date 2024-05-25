@@ -17,7 +17,7 @@ var TotalRequests = prometheus.NewCounterVec(
 
 func Prometheus(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		TotalRequests.WithLabelValues(r.RequestURI).Inc()
 		next.ServeHTTP(w, r)
-		TotalRequests.WithLabelValues(r.RequestURI)
 	})
 }

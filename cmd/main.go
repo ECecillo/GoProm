@@ -22,16 +22,14 @@ func createStack(xs ...types.Middleware) types.Middleware {
 	}
 }
 
-
 func init() {
 	prometheus.Register(middleware.TotalRequests)
 }
 
-
 func main() {
 	PORT := flag.String("PORT", ":8080", "Exposed server port")
 	router := http.NewServeMux()
-	middelwares := createStack(middleware.Prometheus)
+	middelwares := createStack(middleware.Logger, middleware.Prometheus)
 	server := &http.Server{
 		Addr:    *PORT,
 		Handler: middelwares(router),
