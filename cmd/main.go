@@ -27,7 +27,7 @@ func init() {
 }
 
 func main() {
-	PORT := flag.String("PORT", ":8080", "Exposed server port")
+	PORT := flag.String("PORT", ":9000", "Exposed server port")
 	router := http.NewServeMux()
 	middelwares := createStack(middleware.Logger, middleware.Prometheus)
 	server := &http.Server{

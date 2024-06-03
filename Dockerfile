@@ -31,7 +31,7 @@ COPY --from=build /app/bin/goprom-server .
 # But we can document in the Dockerfile what ports
 # the application is going to listen on by default.
 # https://docs.docker.com/engine/reference/builder/#expose
-EXPOSE 8080
+EXPOSE 9000 
 
 # Run
 CMD ["./goprom-server"]
