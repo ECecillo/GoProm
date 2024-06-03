@@ -1,11 +1,11 @@
-import http from 'k6/http';
-import { sleep } from 'k6';
+import http from "k6/http";
+import { sleep } from "k6";
 
 export const options = {
   // A number specifying the number of VUs to run concurrently.
   vus: 100,
   // A string specifying the total duration of the test run.
-  duration: '30s',
+  duration: "30s",
 
   // The following section contains configuration options for execution of this
   // test script in Grafana Cloud.
@@ -54,7 +54,7 @@ export const options = {
 // about authoring k6 scripts.
 //
 export default function () {
-  const server = "http://localhost:8080";
+  const server = "http://localhost:9000";
   const endpoint = "/api/liveliness";
   const urlToTest = `${server}${endpoint}`;
 
