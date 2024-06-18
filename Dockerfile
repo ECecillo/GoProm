@@ -1,30 +1,18 @@
-# syntax=docker/dockerfile:1
+FROM golang:1.22.3-alpine as base
 
-FROM golang:1.22.3 as build
+WORKDIR $GOPATH/src/goprom/app/
 
-# Set destination for COPY
-WORKDIR /app
+COPY . .
 
-# Download Go modules
-COPY go.mod go.sum ./
 RUN go mod download
+RUN go mod verify
 
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY . ./
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /main cmd/main.go
 
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -v -o bin/goprom-server ./cmd/main.go
+FROM gcr.io/distroless/static-debian11
 
-
-# Use a Docker multi-stage build to create a lean production image.
-
-FROM alpine:latest
-
-WORKDIR /app
-
-# Copy the binary to the production image from the builder stage.
-COPY --from=build /app/bin/goprom-server .
+# Copy the binary and necessary files for the user
+COPY --from=base /main .
 
 # Optional:
 # To bind to a TCP port, runtime parameters must be supplied to the docker command.
@@ -33,5 +21,4 @@ COPY --from=build /app/bin/goprom-server .
 # https://docs.docker.com/engine/reference/builder/#expose
 EXPOSE 9000 
 
-# Run
-CMD ["./goprom-server"]
+CMD ["./main"]
