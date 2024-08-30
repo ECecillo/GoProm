@@ -1,26 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
-	"net/http"
 
-	"github.com/ECecillo/GoProm/handlers"
 	"github.com/ECecillo/GoProm/middleware"
-	"github.com/ECecillo/GoProm/types"
+	"github.com/ECecillo/GoProm/server"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
-
-func createStack(xs ...types.Middleware) types.Middleware {
-	return func(next http.Handler) http.Handler {
-		for i := len(xs) - 1; i >= 0; i-- {
-			x := xs[i]
-			next = x(next)
-		}
-		return next
-	}
-}
 
 func init() {
 	prometheus.Register(middleware.TotalRequests)
@@ -28,16 +15,15 @@ func init() {
 
 func main() {
 	PORT := flag.String("PORT", ":9000", "Exposed server port")
-	router := http.NewServeMux()
-	middelwares := createStack(middleware.Logger, middleware.Prometheus)
-	server := &http.Server{
-		Addr:    *PORT,
-		Handler: middelwares(router),
+	config := server.Config{
+		Host: "localhost",
+		Port: *PORT,
 	}
+	ctx := context.Context{}
 
-	router.HandleFunc("GET /api/liveliness", handlers.ServerAlive)
-	router.Handle("/metrics", promhttp.Handler())
 
-	fmt.Println("Server running")
-	server.ListenAndServe()
+	err := server.Create(ctx, &config)
+	if err != nil {
+		panic(err)
+	}
 }
