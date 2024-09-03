@@ -1,5 +1,8 @@
 .PHONY: build-all build run docker-image dev clean clean-all
 
+loadtest:
+	@k6 run --vus 10 --duration 30s loadtesting.js
+
 build:
 	@go build -o bin/server cmd/main.go
 
