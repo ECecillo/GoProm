@@ -22,11 +22,9 @@ func createStack(xs ...types.Middleware) types.Middleware {
 	}
 }
 
-
 func init() {
 	prometheus.Register(middleware.TotalRequests)
 }
-
 
 func main() {
 	PORT := flag.String("PORT", ":8080", "Exposed server port")
